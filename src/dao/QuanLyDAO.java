@@ -11,7 +11,7 @@ public class QuanLyDAO extends NguoiDungDAO{
 		super();
 	}
 	
-	public QuanLy getQuanLy(int id) {
+	public QuanLy getQuanLyById(int id) {
 		
 		String sql = "{call getQLbyId(?)";
 		try{

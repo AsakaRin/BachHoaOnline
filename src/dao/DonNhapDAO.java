@@ -1,6 +1,5 @@
 package dao;
 
-import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -8,10 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.SanPham;
-import model.ThuocTinh;
-import model.LoaiSP;
-import model.NhaCungCap;
-import model.NhomSP;
 
 public class DonNhapDAO extends DAO{
 
@@ -23,7 +18,7 @@ public class DonNhapDAO extends DAO{
 	public boolean luuThongTin(List<SanPham> list) {
 		for(SanPham sp: list) {
 			String sqlThem = "INSERT INTO tblSanPham(id, maSP, tenSP, tblNhomSPid, tblLoaiSPid, gianhap,\r\n"
-					+ " giatang, giaban, tonkho, mota, tblThuoctinhid) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+					+ " giatang, giaban, tonkho, mota) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 			try {
 				PreparedStatement ps = con.prepareStatement(sqlThem);
 	            ps.setInt(1, sp.getId());
@@ -36,7 +31,6 @@ public class DonNhapDAO extends DAO{
 	            ps.setFloat(7, sp.getGiatang());
 	            ps.setInt(9, sp.getTonkho());
 	            ps.setString(10, sp.getMota());
-	            ps.setInt(11, sp.getThuoctinh().getId());
 	            ps.executeQuery();
 			}
 			catch (Exception e) {

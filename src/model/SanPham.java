@@ -15,7 +15,7 @@ public class SanPham {
 	private float giaban;
 	private int tonkho;
 	private String mota;
-	private List<ThuocTinh> thuoctinh;
+	private ThuocTinh thuoctinh;
 	public SanPham() {
 		super();
 	}

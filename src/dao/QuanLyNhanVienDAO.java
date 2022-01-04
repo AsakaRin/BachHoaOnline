@@ -3,6 +3,7 @@ package dao;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import model.NhanVien;
@@ -51,7 +52,7 @@ public class QuanLyNhanVienDAO extends NguoiDungDAO{
 		return null;
 	}
 	
-	public ArrayList<NhanVien> getDanhSachNhanVien() {
+	public ArrayList<NhanVien> getDanhSachNhanVien() throws SQLException {
 		ArrayList<NhanVien> kq= null;
 		String sql = "{call danhsachNhanVien()}";
 		CallableStatement cs = con.prepareCall(sql);
