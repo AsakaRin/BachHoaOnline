@@ -80,7 +80,7 @@ public class DonHangDAO extends DAO{
 	
 	public DonHang getDonHangById(int id) throws SQLException {
 		
-		String sql = "{call donHangById()}";		
+		String sql = "{call getDonHangById()}";		
 		CallableStatement cs = con.prepareCall(sql);
 		ResultSet rs = cs.executeQuery();
 		
@@ -109,11 +109,71 @@ public class DonHangDAO extends DAO{
 		return null;
 	}
 	
-	public void setHuyDonHang() {
-		
+	public void setHuyDonHang(int id) {
+		String sql = "{call huyDonHang(?)}";
+		try {
+			CallableStatement ps = con.prepareCall(sql);
+			ps.setInt(1,id);
+            ps.executeQuery();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public void addDonHang() {
+	public void addDonHang(DonHang dh) {
+		String sql = "{call addDonHang()}";
+		try {
+			CallableStatement ps = con.prepareCall(sql);
+            ps.setInt(1, dh.getId());
+            ps.setInt(2, dh.getKH().getId());
+            ps.setInt(3, dh.getThongtinthanhtoan().getId());
+            ps.setString(4, dh.getNgaydat());
+            ps.setString(5, dh.getNgaygiao());
+            ps.setInt(6, dh.getNguoiduyetdon().getId());
+            ps.setInt(7, dh.getTrangthai());
+            ps.executeQuery();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public ArrayList<DonHang> getLichSuGiaoDichCuaKhachHang(int idKH) {
 		
+		ArrayList<DonHang> list = null;
+		String sql = "{call getDonHangByIdKH()?";
+		try {
+			CallableStatement ps = con.prepareCall(sql);
+            ps.setInt(1, idKH);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+    			
+    			DonHang dh = new DonHang();
+    			dh.setId(rs.getInt("id"));
+    			
+    			KhachHang kh = khDAO.getKHbyId(rs.getInt("idKhachHang"));			
+    			dh.setKH(kh);
+    			
+    			dh.setNgaydat(rs.getString("ngaydat"));
+    			dh.setNgaygiao(rs.getString("ngaygiao"));
+    			
+    			NhanVien nv = nvDAO.getNVbyId(rs.getInt("idNguoiDuyetDon"));
+    			dh.setNguoiduyetdon(nv);    		
+    			
+    			// chua xu ly thong tin thanh toan
+    			dh.setThongtinthanhtoan(null);
+    			
+    			dh.setTrangthai(rs.getInt("trangthai"));
+    			
+    			list.add(dh);
+    		}
+            
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return list;
 	}
 }

@@ -17,7 +17,7 @@ public class HangDatDAO extends DAO{
 	}
 
 	public boolean addToGioHang(HangDat hangdat) {
-		String sqlThem = "{call HangDat(?)}";
+		String sqlThem = "{call addGioHang(?)}";
 		try {
 			PreparedStatement ps = con.prepareStatement(sqlThem);
             ps.setInt(1, hangdat.getId());
@@ -62,7 +62,7 @@ public class HangDatDAO extends DAO{
 	}
 	public List<HangDat> getDSHangDat() {
 		List<HangDat> list = null;
-		String sql = "{call SanPham}";
+		String sql = "{call dsHangDat}";
 		try {
 			CallableStatement cs = con.prepareCall(sql);
 			ResultSet rs = cs.executeQuery();

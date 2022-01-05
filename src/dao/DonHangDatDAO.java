@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.sql.CallableStatement;
 
 import model.DonHangDat;
+import model.KhachHang;
 import model.SanPham;
 import model.DonHang;
 
@@ -23,8 +24,18 @@ public class DonHangDatDAO extends DAO{
 		public float tongtien;		
 	}
 	
+	public class KHTheoDoanhThu {
+		
+		public KhachHang khachhang;
+		public float tongtien;
+	}
+	
 	public boolean containsSP(final ArrayList<SPTheoDoanhThu> list, final SanPham sanpham){
 	    return list.stream().filter(o -> o.sanpham.equals(sanpham)).findFirst().isPresent();
+	}
+	
+	public boolean containsKH(final ArrayList<KHTheoDoanhThu> list, final KhachHang khachhang){
+	    return list.stream().filter(o -> o.khachhang.equals(khachhang)).findFirst().isPresent();
 	}
 	
 	public int indexSP(final ArrayList<SPTheoDoanhThu> list, final SanPham sanpham){
@@ -36,7 +47,16 @@ public class DonHangDatDAO extends DAO{
 		return -1;
 	}
 	
-	public ArrayList<SPTheoDoanhThu> getTKSPTheoDoanhTThu(String startTime, String endTime) throws SQLException {
+	public int indexKH(final ArrayList<KHTheoDoanhThu> list, final KhachHang khachhang){
+		for (int i = 0; i < list.size(); i ++) {
+			if (list.get(i).khachhang.equals(khachhang)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	public ArrayList<SPTheoDoanhThu> getTKSPTheoDoanhThu(String startTime, String endTime) throws SQLException {
 	
 		ArrayList<DonHangDat> danhSachSanPham = getLichSuDanhSachSanPhamTheoThoiGian(startTime, endTime);
 		
@@ -97,7 +117,31 @@ public class DonHangDatDAO extends DAO{
 		return new ArrayList<DonHangDat>(result);
 	}
 	
-	public void getTKKHTheoDoanhThu() {
+	public ArrayList<KHTheoDoanhThu> getTKKHTheoDoanhThu(String startTime, String endTime) throws SQLException {
 		
+		ArrayList<DonHangDat> danhSachSanPham = getLichSuDanhSachSanPhamTheoThoiGian(startTime, endTime);
+		
+		ArrayList<KHTheoDoanhThu> dskhTheoDoanhThu = null;
+		
+		danhSachSanPham.forEach((dhd) -> {
+			
+			DonHang dh = dhd.getDonhang();
+			KhachHang kh = dh.getKH();
+			
+			if (this.containsKH(dskhTheoDoanhThu, kh)) {
+				int index = indexKH(dskhTheoDoanhThu, kh);
+				
+				dskhTheoDoanhThu.get(index).tongtien = dhd.getSanpham().getGiaban();
+			}
+			else {
+				
+				KHTheoDoanhThu khTheoDoanhThu = new KHTheoDoanhThu();
+				khTheoDoanhThu.khachhang = kh;
+				khTheoDoanhThu.tongtien = dhd.getSanpham().getGiaban();
+				dskhTheoDoanhThu.add(khTheoDoanhThu);
+			}
+		});
+		
+		return dskhTheoDoanhThu;
 	}
 }

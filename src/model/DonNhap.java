@@ -8,7 +8,7 @@ public class DonNhap {
 	private String madonnhap;
 	private QuanLy quanly;
 	private NhaCungCap nhaCC;
-	private List<HangNhap> hangnhap;
+	private HangNhap hangnhap;
 	private String ngaynhap;
 	private float tongtien;
 	public DonNhap() {
@@ -38,10 +38,10 @@ public class DonNhap {
 	public void setNhaCC(NhaCungCap nhaCC) {
 		this.nhaCC = nhaCC;
 	}
-	public List<HangNhap> getHangnhap() {
+	public HangNhap getHangnhap() {
 		return hangnhap;
 	}
-	public void setHangnhap(List<HangNhap> hangnhap) {
+	public void setHangnhap(HangNhap hangnhap) {
 		this.hangnhap = hangnhap;
 	}
 	public String getNgaynhap() {

@@ -2,23 +2,41 @@ package dao;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
+import dao.DonHangDatDAO.SPTheoDoanhThu;
+import model.DonHang;
+import model.DonHangDat;
 import model.DonHangNhap;
 import model.DonNhap;
+import model.HangNhap;
+import model.NhaCungCap;
 import model.SanPham;
 
 public class DonHangNhapDAO extends DAO{ 
 
-	DonNhapDAO dhDAO = new DonNhapDAO();
-	SanPhamDAO spDAO = new SanPhamDAO();
+	DonNhapDAO dnDAO = new DonNhapDAO();
+	SanPhamDAO spDAO = new SanPhamDAO();	
 	
-	
-	public class SPTheoDoanhThu {
-	
-		public SanPham sanpham;
+	public class SPTheoNCC {
+		
+		public HangNhap hangnhap;
 		public int soluong;
-		public float tongtien;		
+		public NhaCungCap ncc;		
+	}
+	
+	public boolean containsHN(final ArrayList<SPTheoNCC> list, final HangNhap hangnhap){
+	    return list.stream().filter(o -> o.hangnhap.equals(hangnhap)).findFirst().isPresent();
+	}
+	
+	public int indexHN(final ArrayList<SPTheoNCC> list, final HangNhap hangnhap){
+		for (int i = 0; i < list.size(); i ++) {
+			if (list.get(i).hangnhap.equals(hangnhap)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 	
 	
@@ -35,7 +53,7 @@ public class DonHangNhapDAO extends DAO{
 			DonHangNhap dhn = new DonHangNhap();		
 			dhn.setId(rs.getInt("id"));
 			
-			DonNhap dn = dhDAO.getDonNhapById(rs.getInt("idDonNhap"));
+			DonNhap dn = dnDAO.getDonNhapById(rs.getInt("idDonNhap"));
 			dhn.setDonnhap(dn);
 			
 			SanPham sp = spDAO.getSanPhamById(rs.getInt("idSanPham"));
@@ -48,32 +66,58 @@ public class DonHangNhapDAO extends DAO{
 	
 
 	
-	public ArrayList<SPTheoDoanhThu> getThongKeSPTheoNCC(String startTime, String endTime) throws SQLException {
+	public ArrayList<SPTheoNCC> getThongKeSPTheoNCC(String startTime, String endTime) throws SQLException {
 		
-		ArrayList<DonNhap> danhSachSanPham = getLichSuDanhSachSanPhamTheoThoiGian(startTime, endTime);
+		ArrayList<DonNhap> danhSachSanPham = dnDAO.getDanhSachDonNhapTheoThoiGian(startTime, endTime);
 		
-		ArrayList<SPTheoDoanhThu> dsspTheoDoanhThu = null;
+		ArrayList<SPTheoNCC> dsspTheoNCC = null;
 		
-		danhSachSanPham.forEach((dhd) -> {
+		danhSachSanPham.forEach((dhn) -> {
 			
-			if (this.containsSP(dsspTheoDoanhThu, dhd.getSanpham())) {
-				int index = indexSP(dsspTheoDoanhThu, dhd.getSanpham());
+			if (this.containsHN(dsspTheoNCC, dhn.getHangnhap())) {
+				int index = indexHN(dsspTheoNCC, dhn.getHangnhap());
 				
-				dsspTheoDoanhThu.get(index).soluong += 1;
-				dsspTheoDoanhThu.get(index).tongtien = dhd.getSanpham().getGiaban();
+				dsspTheoNCC.get(index).soluong += 1;				
+				dsspTheoNCC.get(index).ncc = dhn.getNhaCC();
 			}
 			else {
-				SPTheoDoanhThu spTheoDoanhThu = new SPTheoDoanhThu();
-				spTheoDoanhThu.sanpham = dhd.getSanpham();
+				SPTheoNCC spTheoDoanhThu = new SPTheoNCC();
+				spTheoDoanhThu.hangnhap = dhn.getHangnhap();
 				spTheoDoanhThu.soluong = 1;
-				spTheoDoanhThu.tongtien = dhd.getSanpham().getGiaban();
-				dsspTheoDoanhThu.add(spTheoDoanhThu);
+				spTheoDoanhThu.ncc = dhn.getNhaCC();
+				dsspTheoNCC.add(spTheoDoanhThu);
 			}
 		});
 		
-		return dsspTheoDoanhThu;
+		return dsspTheoNCC;
 	}
 	
+	public ArrayList<DonHangNhap> getDanhSachDonHangNhapTheoThoiGian(String startTime, String endTime) throws SQLException {
+		
+		ArrayList<DonHangNhap> list = null;
+		
+		String sql = "{call getDonHangNhapTheoThoiGian(?, ?)";
+		CallableStatement cs = con.prepareCall(sql);
+		cs.setString(1, startTime);
+		cs.setString(2, endTime);
+		ResultSet rs = cs.executeQuery();
+		
+		while(rs.next()){
+			
+			DonHangNhap dhn = new DonHangNhap();
+			dhn.setId(rs.getInt("id"));
+			
+			DonNhap dn = dnDAO.getDonNhapById(rs.getInt("idDonHang"));
+			dhn.setDonnhap(dn);
+			
+			SanPham sp = spDAO.getSanPhamById(rs.getInt("idSanPham"));
+			dhn.setSanpham(sp);
+			
+			list.add(dhn);
+		}
+		
+		return list;		
+	}
 }
 
 
